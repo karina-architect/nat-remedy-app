@@ -6,27 +6,30 @@ export default async function handler(req, res) {
       return res.status(405).json({ error: "Method not allowed" });
     }
 
+    // 🔑 Check API key
+    if (!process.env.OPENAI_API_KEY) {
+      return res.status(500).json({ error: "Missing OpenAI API key" });
+    }
+
     const openai = new OpenAI({
       apiKey: process.env.OPENAI_API_KEY,
     });
 
     const { issue, details } = req.body;
 
-    const completion = await openai.chat.completions.create({
+    if (!issue) {
+      return res.status(400).json({ error: "Missing issue" });
+    }
+
+    // ✅ NEW STABLE API
+    const response = await openai.responses.create({
       model: "gpt-4o-mini",
-      messages: [
-        {
-          role: "system",
-          content: "You are a helpful natural remedy expert.",
-        },
-        {
-          role: "user",
-          content: `Give a natural remedy for ${issue}. Details: ${details}`,
-        },
-      ],
+      input: `Give a simple natural home remedy for: ${issue}. Details: ${details}`,
     });
 
-    const text = completion.choices[0].message.content;
+    const text =
+      response.output?.[0]?.content?.[0]?.text ||
+      "Natural remedy could not be generated.";
 
     return res.status(200).json({
       title: `${issue} Remedy`,
@@ -38,7 +41,10 @@ export default async function handler(req, res) {
     });
 
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({ error: "Server error" });
+    console.error("FULL ERROR:", error);
+
+    return res.status(500).json({
+      error: error.message || "Server error",
+    });
   }
 }
