@@ -1,0 +1,410 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta name="theme-color" content="#65a30d" />
+  <title>NAT – Natural Remedy Finder</title>
+  <style>
+    :root{
+      --bg1:#f7fee7; --bg2:#ecfccb; --white:#ffffff; --text:#0f172a; --muted:#64748b;
+      --lime:#65a30d; --lime2:#84cc16; --emerald:#059669; --emerald2:#10b981; --border:#e2e8f0;
+      --card:rgba(255,255,255,.82);
+      --shadow:0 20px 80px -35px rgba(15,23,42,.28);
+      --shadow-green:0 20px 80px -35px rgba(34,197,94,.45);
+      --radius:28px;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:var(--text);
+      background:radial-gradient(circle at top left,var(--bg1),var(--bg2) 18%,#f8fafc 55%,#fff 100%);} 
+    .page{max-width:1400px;margin:0 auto;padding:24px}
+    .topbar,.card{background:var(--card);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.7);border-radius:var(--radius);box-shadow:var(--shadow)}
+    .topbar{display:flex;justify-content:space-between;gap:20px;align-items:center;padding:20px;box-shadow:var(--shadow-green);margin-bottom:24px}
+    .logo{display:flex;align-items:center;gap:14px}
+    .logo-mark{position:relative;width:46px;height:46px;border-radius:18px;background:linear-gradient(135deg,#d9f99d,#bbf7d0,#6ee7b7);display:grid;place-items:center;box-shadow:0 10px 24px rgba(34,197,94,.22)}
+    .logo-mark .nat{position:absolute;right:-5px;top:-5px;background:#fff;color:#15803d;border-radius:999px;padding:2px 6px;font-size:9px;font-weight:800;letter-spacing:.06em;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+    .logo h1{margin:0;font-size:15px;color:#84cc16;letter-spacing:.02em}
+    .logo p{margin:2px 0 0;font-size:12px;color:var(--muted)}
+    .topbar-right{display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:flex-end}
+    .stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;min-width:420px}
+    .stat{border:1px solid #ecfccb;background:rgba(236,252,203,.65);border-radius:18px;padding:12px 14px}
+    .stat .k{font-size:12px;color:var(--muted)} .stat .v{margin-top:4px;font-weight:800}
+    .layout{display:grid;grid-template-columns:370px minmax(0,1fr) 290px;gap:24px}
+    .sticky{position:sticky;top:16px}
+    .card header{padding:24px 24px 0}.card .content{padding:24px}
+    .title{font-size:28px;font-weight:800;margin:0 0 4px}
+    .label{display:block;font-size:14px;color:#334155;margin:0 0 8px;font-weight:600}
+    input,textarea,button,select{font:inherit}
+    .input,.textarea,.select{width:100%;border:1px solid #d9f99d;background:rgba(255,255,255,.92);border-radius:18px;padding:14px 16px;outline:none;font-size:16px}
+    .textarea{min-height:120px;resize:vertical}
+    .input:focus,.textarea:focus,.select:focus{border-color:#84cc16;box-shadow:0 0 0 4px rgba(132,204,22,.14)}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .aud{border:1px solid #e2e8f0;background:#fff;border-radius:18px;padding:16px;cursor:pointer;transition:.18s}
+    .aud.active{border-color:#a3e635;background:#f7fee7;box-shadow:0 6px 18px rgba(132,204,22,.12)}
+    .btn{border:none;border-radius:18px;padding:13px 16px;font-weight:700;cursor:pointer;transition:.18s;display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px}
+    .btn-primary{background:#65a30d;color:#fff}.btn-primary:hover{background:#4d7c0f}
+    .btn-outline{background:#fff;border:1px solid var(--border);color:#0f172a}.btn-outline:hover{background:#f8fafc}
+    .tip{background:linear-gradient(135deg,#f7fee7,#ecfdf5);border-radius:18px;padding:14px;color:#475569;font-size:14px}
+    .hero{overflow:hidden}
+    .hero-grid,.result-grid{display:grid;grid-template-columns:1.05fr .95fr}
+    .hero .content{padding:34px}
+    .pill{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:6px 12px;font-size:12px;font-weight:700}
+    .pill-green{background:#ecfccb;color:#65a30d}
+    .hero h2{font-size:44px;line-height:1.05;margin:18px 0 0}.hero p{color:#475569;line-height:1.75;max-width:720px}
+    .badges{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}.badge{display:inline-flex;align-items:center;gap:6px;border:1px solid #d9f99d;background:#fff;border-radius:999px;padding:8px 12px;font-size:13px}
+    .img{width:100%;height:100%;object-fit:cover;display:block}.hero-img,.result-img{position:relative;min-height:320px;background:#e2e8f0}
+    .overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(2,6,23,.56),transparent 55%)}
+    .img-caption{position:absolute;left:0;right:0;bottom:0;padding:22px;color:#fff}
+    .img-caption .mini{display:inline-flex;gap:8px;background:rgba(255,255,255,.15);padding:8px 12px;border-radius:999px;backdrop-filter:blur(8px);font-size:12px}
+    .img-caption .headline{margin-top:12px;font-size:22px;font-weight:700;max-width:420px}
+    .stack{display:flex;flex-direction:column;gap:20px}
+    .result .content{padding:28px 30px}
+    .result h3{font-size:34px;line-height:1.08;margin:0}.summary{margin-top:12px;color:#475569;line-height:1.7}
+    .meta{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:16px}
+    .chip{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:7px 12px;font-size:12px;font-weight:700}
+    .chip-solid{background:#65a30d;color:#fff}.chip-soft{border:1px solid #d9f99d;color:#65a30d;background:#fff}.chip-muted{background:#f1f5f9;color:#64748b}
+    .two{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:24px}
+    .panel{border-radius:24px;padding:20px;border:1px solid #ecfccb;background:rgba(247,254,231,.72)}
+    .panel.em{border-color:#d1fae5;background:rgba(236,253,245,.75)}
+    .panel h4,.steps h4{margin:0 0 14px;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:#65a30d;display:flex;gap:8px;align-items:center}
+    .benefit{display:flex;gap:10px;align-items:flex-start;margin:9px 0;color:#334155;font-size:14px}
+    .steps{margin-top:16px;border-radius:24px;padding:20px;border:1px solid #f1f5f9;background:rgba(248,250,252,.95)}
+    .step{display:flex;gap:12px;background:#fff;border-radius:18px;padding:14px 16px;box-shadow:0 6px 18px rgba(15,23,42,.06);margin-top:10px}
+    .step-num{flex:none;width:28px;height:28px;border-radius:999px;background:#65a30d;color:#fff;font-weight:800;display:grid;place-items:center;font-size:14px}
+    .actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+    .saved-list{display:flex;flex-direction:column;gap:12px}
+    .saved-item{border:1px solid #f1f5f9;background:#f8fafc;border-radius:18px;padding:14px}
+    .saved-item-title{font-weight:700}.saved-item-sub{margin-top:4px;font-size:12px;color:#64748b}
+    .empty{border:1px dashed #cbd5e1;background:#f8fafc;border-radius:18px;padding:14px;color:#64748b;line-height:1.7;font-size:14px}
+    .small-muted{font-size:14px;color:#64748b}.side-callout{margin-top:16px;border-radius:18px;padding:16px;background:linear-gradient(135deg,#f7fee7,#ecfdf5);color:#475569;font-size:14px;line-height:1.6}
+    .side-callout b{color:#0f172a}
+    .icon-badge{display:inline-flex;align-items:center;gap:7px;border:1px solid #d9f99d;background:#fff;border-radius:999px;padding:8px 12px;font-size:13px;font-weight:600}
+    .footer-note{font-size:12px;color:#64748b;margin-top:12px}
+    .result-enter{opacity:0;transform:translateY(16px) scale(.992)}
+    .result-enter.show{opacity:1;transform:translateY(0) scale(1);transition:all .42s ease}
+    .spinner{width:18px;height:18px;border:2px solid rgba(255,255,255,.45);border-top-color:#fff;border-radius:999px;display:none;animation:spin .8s linear infinite}
+    .loading .spinner{display:inline-block}
+    .loading .btn-label{opacity:.9}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    @media (max-width:1200px){.layout{grid-template-columns:1fr}.sticky{position:static}.stats{min-width:0;grid-template-columns:repeat(2,1fr)}.topbar{flex-direction:column;align-items:stretch}.topbar-right{justify-content:space-between}.hero-grid,.result-grid,.two{grid-template-columns:1fr}}
+    @media (max-width:700px){.page{padding:14px}.hero h2{font-size:34px}.title{font-size:24px}.result h3{font-size:28px}.stats{grid-template-columns:1fr 1fr}.row{grid-template-columns:1fr}.topbar-right{flex-direction:column;align-items:stretch}.stats{min-width:0}}
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="topbar">
+      <div class="logo">
+        <div class="logo-mark">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M18.5 3.5C12 4 7 8.5 6 15c2.5-1.8 4.4-2.5 7.5-2.5-2 1.2-3.4 2.6-4.8 5 4.8-.8 8.8-5 9.3-14Z" fill="#15803d"/>
+            <path d="M6 15c1.6-.8 3.2-1.1 4.8-1.1" stroke="#166534" stroke-width="1.6" stroke-linecap="round"/>
+          </svg>
+          <span class="nat">NAT</span>
+        </div>
+        <div>
+          <h1 id="brandTitle">Natural Remedy Finder</h1>
+          <p id="brandSubtitle">Botanical wellness recipes for everyday comfort</p>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <select id="langSwitch" class="btn btn-outline" aria-label="Language">
+          <option value="en">EN</option>
+          <option value="es">ES</option>
+          <option value="fr">FR</option>
+          <option value="ru">RU</option>
+        </select>
+        <div class="stats">
+          <div class="stat"><div class="k" id="searchesLabel">Searches</div><div class="v" id="searchCount">0</div></div>
+          <div class="stat"><div class="k" id="savedLabel">Saved</div><div class="v" id="savedCount">0</div></div>
+          <div class="stat"><div class="k" id="focusLabel">Focus</div><div class="v" id="focusValue" style="font-size:14px">Wellness UI</div></div>
+          <div class="stat"><div class="k" id="styleLabel">Style</div><div class="v" id="styleValue" style="font-size:14px">Startup premium</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="layout">
+      <div class="card sticky">
+        <header><h2 class="title" id="formTitle">Describe the symptom</h2></header>
+        <div class="content">
+          <label class="label" for="issue" id="issueLabel">Health issue</label>
+          <input id="issue" class="input" placeholder="Dry cough, skin rash, poor sleep..." />
+
+          <div style="height:16px"></div>
+          <label class="label" for="details" id="detailsLabel">Extra details</label>
+          <textarea id="details" class="textarea" placeholder="Example: started today, mild discomfort, looking for home ingredients"></textarea>
+
+          <div style="height:16px"></div>
+          <label class="label" id="audienceLabel">Audience</label>
+          <div class="row">
+            <div id="adultBtn" class="aud active"><div style="font-weight:700" id="adultTitle">Adult</div><div class="small-muted" id="adultDesc">Balanced home remedies</div></div>
+            <div id="childBtn" class="aud"><div style="font-weight:700" id="childTitle">Child</div><div class="small-muted" id="childDesc">Gentler suggestions</div></div>
+          </div>
+
+          <div style="height:16px"></div>
+          <button id="generateBtn" class="btn btn-primary" style="width:100%"><span class="spinner"></span><span class="btn-label">🔎 Generate remedy</span></button>
+
+          <div style="height:14px"></div>
+          <div class="tip" id="tipText">Press <b style="color:#0f172a">Enter</b> to generate automatically.</div>
+          <div class="footer-note" id="footerNote">For general wellness and home comfort information only. Not a diagnosis tool or a replacement for medical care.</div>
+        </div>
+      </div>
+
+      <div class="stack" id="resultsArea">
+        <div class="card hero" id="heroCard">
+          <div class="hero-grid">
+            <div class="content">
+              <span class="pill pill-green" id="heroPill">Premium wellness search</span>
+              <h2 id="heroTitle">Beautiful remedy cards, crafted like a real startup product.</h2>
+              <p id="heroText">Search symptoms, generate elegant natural comfort recipes, save favorites locally, and build a polished stack of remedy cards for later reference.</p>
+              <div class="badges">
+                <span class="badge" id="heroBadge1">🌿 Ingredients with icons</span>
+                <span class="badge" id="heroBadge2">💾 Saved locally</span>
+                <span class="badge" id="heroBadge3">🖨️ Print and export</span>
+              </div>
+            </div>
+            <div class="hero-img">
+              <img class="img" src="https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&w=1400&q=80" alt="Natural wellness ingredients" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&w=1400&q=80'">
+              <div class="overlay"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card sticky">
+        <header>
+          <h2 class="title" style="font-size:24px" id="savedTitle">Saved remedies</h2>
+          <div class="small-muted" id="savedSub">stored locally</div>
+        </header>
+        <div class="content">
+          <div id="savedList" class="saved-list"></div>
+          <div id="savedEmpty" class="empty">No saved items yet — click "Save" on a remedy.</div>
+          <div class="row" style="margin-top:16px">
+            <button id="clearSavedBtn" class="btn btn-outline">🗑️ Clear</button>
+            <button id="exportSavedBtn" class="btn btn-outline">⬇️ Export</button>
+          </div>
+          <div class="side-callout">
+            <div><b id="calloutTitle">Ready for launch</b></div>
+            <div id="calloutText">This UI is styled like a polished wellness startup product and works as a standalone MVP.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const fallbackImage = 'https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&w=1400&q=80';
+    const translations = {
+      en: {brandTitle:'Natural Remedy Finder',brandSubtitle:'Botanical wellness recipes for everyday comfort',searches:'Searches',saved:'Saved',focus:'Focus',style:'Style',focusValue:'Wellness UI',styleValue:'Startup premium',formTitle:'Describe the symptom',issueLabel:'Health issue',issuePlaceholder:'Dry cough, skin rash, poor sleep...',detailsLabel:'Extra details',detailsPlaceholder:'Example: started today, mild discomfort, looking for home ingredients',audience:'Audience',adult:'Adult',adultDesc:'Balanced home remedies',child:'Child',childDesc:'Gentler suggestions',generate:'🔎 Generate remedy',tip:'Press <b style="color:#0f172a">Enter</b> to generate automatically.',footer:'For general wellness and home comfort information only. Not a diagnosis tool or a replacement for medical care.',heroPill:'Premium wellness search',heroTitle:'Beautiful remedy cards, crafted like a real startup product.',heroText:'Search symptoms, generate elegant natural comfort recipes, save favorites locally, and build a polished stack of remedy cards for later reference.',heroBadge1:'🌿 Ingredients with icons',heroBadge2:'💾 Saved locally',heroBadge3:'🖨️ Print and export',savedTitle:'Saved remedies',savedSub:'stored locally',savedEmpty:'No saved items yet — click "Save" on a remedy.',clear:'🗑️ Clear',export:'⬇️ Export',calloutTitle:'Ready for launch',calloutText:'This UI is styled like a polished wellness startup product and works as a standalone MVP.',ingredients:'🧪 Ingredients',benefits:'💚 Benefits',preparation:'✨ Preparation',aiChip:'🤖 AI Generated',print:'🖨️ Print',copy:'📋 Copy All',save:'💾 Save Card',savedBtn:'✅ Saved',more:'🔁 More Remedies',premiumRecipe:'🔖 Premium natural recipe',imageHeadline:'Relevant home ingredients, beautifully presented',copied:'✅ Copied'},
+      es: {brandTitle:'Buscador Natural de Remedios',brandSubtitle:'Recetas botánicas de bienestar para el confort diario',searches:'Búsquedas',saved:'Guardados',focus:'Enfoque',style:'Estilo',focusValue:'UI bienestar',styleValue:'Premium startup',formTitle:'Describe el síntoma',issueLabel:'Problema de salud',issuePlaceholder:'Tos seca, erupción cutánea, mal sueño...',detailsLabel:'Detalles extra',detailsPlaceholder:'Ejemplo: empezó hoy, molestia leve, busco ingredientes caseros',audience:'Audiencia',adult:'Adulto',adultDesc:'Remedios caseros equilibrados',child:'Niño',childDesc:'Sugerencias más suaves',generate:'🔎 Generar remedio',tip:'Pulsa <b style="color:#0f172a">Enter</b> para generar automáticamente.',footer:'Solo para bienestar general y confort en casa. No es una herramienta de diagnóstico ni sustituye atención médica.',heroPill:'Búsqueda premium de bienestar',heroTitle:'Tarjetas de remedios hermosas, creadas como un producto real de startup.',heroText:'Busca síntomas, genera recetas naturales elegantes, guarda favoritos localmente y crea una colección pulida para consultar después.',heroBadge1:'🌿 Ingredientes con iconos',heroBadge2:'💾 Guardado local',heroBadge3:'🖨️ Imprimir y exportar',savedTitle:'Remedios guardados',savedSub:'guardados localmente',savedEmpty:'Aún no hay elementos guardados — pulsa "Guardar" en un remedio.',clear:'🗑️ Borrar',export:'⬇️ Exportar',calloutTitle:'Listo para lanzar',calloutText:'Esta interfaz está diseñada como un producto wellness pulido y funciona como un MVP independiente.',ingredients:'🧪 Ingredientes',benefits:'💚 Beneficios',preparation:'✨ Preparación',aiChip:'🤖 Generado por IA',print:'🖨️ Imprimir',copy:'📋 Copiar todo',save:'💾 Guardar tarjeta',savedBtn:'✅ Guardado',more:'🔁 Más remedios',premiumRecipe:'🔖 Receta natural premium',imageHeadline:'Ingredientes caseros relevantes, bellamente presentados',copied:'✅ Copiado'},
+      fr: {brandTitle:'Chercheur de Remèdes Naturels',brandSubtitle:'Recettes botaniques bien-être pour le confort quotidien',searches:'Recherches',saved:'Enregistrés',focus:'Focus',style:'Style',focusValue:'UI bien-être',styleValue:'Startup premium',formTitle:'Décrivez le symptôme',issueLabel:'Problème de santé',issuePlaceholder:'Toux sèche, éruption cutanée, mauvais sommeil...',detailsLabel:'Détails supplémentaires',detailsPlaceholder:'Exemple : commencé aujourd’hui, gêne légère, ingrédients maison recherchés',audience:'Public',adult:'Adulte',adultDesc:'Remèdes maison équilibrés',child:'Enfant',childDesc:'Suggestions plus douces',generate:'🔎 Générer un remède',tip:'Appuyez sur <b style="color:#0f172a">Entrée</b> pour générer automatiquement.',footer:'Pour le bien-être général et le confort à la maison uniquement. Ce n’est ni un diagnostic ni un remplacement des soins médicaux.',heroPill:'Recherche bien-être premium',heroTitle:'De magnifiques cartes de remèdes, conçues comme un vrai produit startup.',heroText:'Recherchez des symptômes, générez des recettes naturelles élégantes, enregistrez vos favoris localement et créez une pile raffinée de cartes remèdes.',heroBadge1:'🌿 Ingrédients avec icônes',heroBadge2:'💾 Sauvegarde locale',heroBadge3:'🖨️ Imprimer et exporter',savedTitle:'Remèdes enregistrés',savedSub:'stockés localement',savedEmpty:'Aucun élément enregistré pour le moment — cliquez sur « Enregistrer » sur un remède.',clear:'🗑️ Effacer',export:'⬇️ Exporter',calloutTitle:'Prêt au lancement',calloutText:'Cette interface est conçue comme un produit bien-être startup haut de gamme et fonctionne comme un MVP autonome.',ingredients:'🧪 Ingrédients',benefits:'💚 Bienfaits',preparation:'✨ Préparation',aiChip:'🤖 Généré par IA',print:'🖨️ Imprimer',copy:'📋 Copier tout',save:'💾 Enregistrer la carte',savedBtn:'✅ Enregistré',more:'🔁 Plus de remèdes',premiumRecipe:'🔖 Recette naturelle premium',imageHeadline:'Des ingrédients maison pertinents, présentés avec élégance',copied:'✅ Copié'},
+      ru: {brandTitle:'Поиск Натуральных Средств',brandSubtitle:'Ботанические рецепты для ежедневного комфорта',searches:'Поиски',saved:'Сохранено',focus:'Фокус',style:'Стиль',focusValue:'Wellness UI',styleValue:'Премиум стартап',formTitle:'Опишите симптом',issueLabel:'Проблема со здоровьем',issuePlaceholder:'Сухой кашель, сыпь, плохой сон...',detailsLabel:'Дополнительные детали',detailsPlaceholder:'Например: началось сегодня, лёгкий дискомфорт, ищу домашние ингредиенты',audience:'Аудитория',adult:'Взрослый',adultDesc:'Сбалансированные домашние средства',child:'Ребёнок',childDesc:'Более мягкие варианты',generate:'🔎 Создать средство',tip:'Нажмите <b style="color:#0f172a">Enter</b>, чтобы сгенерировать автоматически.',footer:'Только для общего комфорта и домашнего ухода. Это не диагностика и не замена медицинской помощи.',heroPill:'Премиальный wellness-поиск',heroTitle:'Красивые карточки средств, как у настоящего стартап-продукта.',heroText:'Ищите симптомы, создавайте элегантные натуральные рецепты, сохраняйте избранное локально и собирайте стильную коллекцию карточек.',heroBadge1:'🌿 Ингредиенты с иконками',heroBadge2:'💾 Локальное сохранение',heroBadge3:'🖨️ Печать и экспорт',savedTitle:'Сохранённые средства',savedSub:'хранятся локально',savedEmpty:'Пока ничего не сохранено — нажмите «Сохранить» на карточке.',clear:'🗑️ Очистить',export:'⬇️ Экспорт',calloutTitle:'Готово к запуску',calloutText:'Этот интерфейс оформлен как polished wellness startup product и работает как самостоятельный MVP.',ingredients:'🧪 Ингредиенты',benefits:'💚 Польза',preparation:'✨ Приготовление',aiChip:'🤖 Сгенерировано ИИ',print:'🖨️ Печать',copy:'📋 Копировать всё',save:'💾 Сохранить карточку',savedBtn:'✅ Сохранено',more:'🔁 Ещё средства',premiumRecipe:'🔖 Премиальный натуральный рецепт',imageHeadline:'Подходящие домашние ингредиенты, красиво оформленные',copied:'✅ Скопировано'}
+    };
+
+    const state = { ageGroup:'adult', history:[], saved:JSON.parse(localStorage.getItem('nat_saved_remedies_v1')||'[]'), lang:'en', clearOnNextFocus:false };
+    const issueEl = document.getElementById('issue');
+    const detailsEl = document.getElementById('details');
+    const resultsArea = document.getElementById('resultsArea');
+    const searchCount = document.getElementById('searchCount');
+    const savedCount = document.getElementById('savedCount');
+    const savedList = document.getElementById('savedList');
+    const savedEmpty = document.getElementById('savedEmpty');
+    const heroCard = document.getElementById('heroCard');
+    const generateBtn = document.getElementById('generateBtn');
+
+    function escapeHtml(str){return (str||'').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
+    function iconForIngredient(name){
+      const n = name.toLowerCase();
+      if(n.includes('water')) return '💧';
+      if(n.includes('honey')) return '✨';
+      if(n.includes('lemon')) return '☀️';
+      if(n.includes('ginger')) return '🔥';
+      if(n.includes('mint')||n.includes('herb')||n.includes('aloe')) return '🌿';
+      if(n.includes('tea')) return '🍵';
+      if(n.includes('oat')) return '🌾';
+      return '🌱';
+    }
+    function updateStats(){ searchCount.textContent = state.history.length; savedCount.textContent = state.saved.length; }
+    function saveSaved(){ localStorage.setItem('nat_saved_remedies_v1', JSON.stringify(state.saved)); renderSaved(); updateStats(); }
+    function renderSaved(){
+      const t = translations[state.lang];
+      savedList.innerHTML='';
+      if(!state.saved.length){ savedEmpty.style.display='block'; savedEmpty.textContent=t.savedEmpty; }
+      else {
+        savedEmpty.style.display='none';
+        state.saved.forEach(item=>{ const div=document.createElement('div'); div.className='saved-item'; div.innerHTML=`<div class="saved-item-title">${escapeHtml(item.title)}</div><div class="saved-item-sub">${escapeHtml(item.condition||'Saved recipe')}</div>`; savedList.appendChild(div); });
+      }
+    }
+    function applyLanguage(){
+      const t = translations[state.lang];
+      document.documentElement.lang = state.lang;
+      document.getElementById('brandTitle').textContent = t.brandTitle;
+      document.getElementById('brandSubtitle').textContent = t.brandSubtitle;
+      document.getElementById('searchesLabel').textContent = t.searches;
+      document.getElementById('savedLabel').textContent = t.saved;
+      document.getElementById('focusLabel').textContent = t.focus;
+      document.getElementById('styleLabel').textContent = t.style;
+      document.getElementById('focusValue').textContent = t.focusValue;
+      document.getElementById('styleValue').textContent = t.styleValue;
+      document.getElementById('formTitle').textContent = t.formTitle;
+      document.getElementById('issueLabel').textContent = t.issueLabel;
+      issueEl.placeholder = t.issuePlaceholder;
+      document.getElementById('detailsLabel').textContent = t.detailsLabel;
+      detailsEl.placeholder = t.detailsPlaceholder;
+      document.getElementById('audienceLabel').textContent = t.audience;
+      document.getElementById('adultTitle').textContent = t.adult;
+      document.getElementById('adultDesc').textContent = t.adultDesc;
+      document.getElementById('childTitle').textContent = t.child;
+      document.getElementById('childDesc').textContent = t.childDesc;
+      generateBtn.querySelector('.btn-label').textContent = t.generate;
+      document.getElementById('tipText').innerHTML = t.tip;
+      document.getElementById('footerNote').textContent = t.footer;
+      document.getElementById('heroPill').textContent = t.heroPill;
+      document.getElementById('heroTitle').textContent = t.heroTitle;
+      document.getElementById('heroText').textContent = t.heroText;
+      document.getElementById('heroBadge1').textContent = t.heroBadge1;
+      document.getElementById('heroBadge2').textContent = t.heroBadge2;
+      document.getElementById('heroBadge3').textContent = t.heroBadge3;
+      document.getElementById('savedTitle').textContent = t.savedTitle;
+      document.getElementById('savedSub').textContent = t.savedSub;
+      document.getElementById('clearSavedBtn').textContent = t.clear;
+      document.getElementById('exportSavedBtn').textContent = t.export;
+      document.getElementById('calloutTitle').textContent = t.calloutTitle;
+      document.getElementById('calloutText').textContent = t.calloutText;
+      renderSaved();
+      renderHistory();
+    }
+
+    function createResultCard(item){
+      const t = translations[state.lang];
+      const wrap=document.createElement('div');
+      wrap.className='card result result-enter';
+      const ingredients = item.ingredients.map(i=>`<span class="icon-badge">${iconForIngredient(i)} ${escapeHtml(i)}</span>`).join('');
+      const benefits = item.benefits.map(b=>`<div class="benefit"><span>✅</span><span>${escapeHtml(b)}</span></div>`).join('');
+      const steps = item.steps.map((s,idx)=>`<div class="step"><div class="step-num">${idx+1}</div><div style="font-size:14px;line-height:1.7;color:#334155">${escapeHtml(s)}</div></div>`).join('');
+      wrap.innerHTML = `
+        <div class="result-grid">
+          <div class="content">
+            <div class="meta">
+              <span class="chip chip-solid">${item.ageGroup==='adult' ? translations[state.lang].adult : translations[state.lang].child}</span>
+              <span class="chip chip-soft">${escapeHtml(item.condition)}</span>
+              <span class="chip chip-muted">⏱ ${escapeHtml(item.prepTime || '5 min')}</span>
+              <span class="chip chip-muted">${t.aiChip}</span>
+            </div>
+            <h3>${escapeHtml(item.title)}</h3>
+            <div class="summary">${escapeHtml(item.summary)}</div>
+            <div class="two">
+              <div class="panel">
+                <h4>${t.ingredients}</h4>
+                <div class="badges">${ingredients}</div>
+              </div>
+              <div class="panel em">
+                <h4>${t.benefits}</h4>
+                ${benefits}
+              </div>
+            </div>
+            <div class="steps">
+              <h4>${t.preparation}</h4>
+              ${steps}
+            </div>
+            <div class="actions">
+              <button class="btn btn-outline js-print">${t.print}</button>
+              <button class="btn btn-outline js-copy">${t.copy}</button>
+              <button class="btn btn-primary js-save">${t.save}</button>
+              <button class="btn btn-outline js-more">${t.more}</button>
+            </div>
+          </div>
+          <div class="result-img">
+            <img class="img" src="${item.image || fallbackImage}" alt="${escapeHtml(item.title)}" onerror="this.onerror=null;this.src='${fallbackImage}'">
+            <div class="overlay"></div>
+            <div class="img-caption">
+              <div class="mini">${t.premiumRecipe}</div>
+              <div class="headline">${t.imageHeadline}</div>
+            </div>
+          </div>
+        </div>`;
+      requestAnimationFrame(()=>wrap.classList.add('show'));
+      wrap.querySelector('.js-print').addEventListener('click', ()=>window.print());
+      wrap.querySelector('.js-copy').addEventListener('click', async ()=>{
+        const btn = wrap.querySelector('.js-copy');
+        const text = `${item.title}\n\nSummary: ${item.summary}\n\nIngredients:\n- ${item.ingredients.join('\n- ')}\n\nSteps:\n- ${item.steps.join('\n- ')}`;
+        try { await navigator.clipboard.writeText(text); btn.textContent=t.copied; setTimeout(()=>btn.textContent=t.copy, 1200); } catch(e) {}
+      });
+      wrap.querySelector('.js-save').addEventListener('click', ()=>{
+        const btn = wrap.querySelector('.js-save');
+        state.saved.unshift(item); saveSaved(); btn.textContent=t.savedBtn; btn.style.background='#16a34a'; setTimeout(()=>{ btn.textContent=t.save; btn.style.background=''; },1500);
+      });
+      wrap.querySelector('.js-more').addEventListener('click', ()=>{ generate(Math.floor(Math.random()*1000)); });
+      return wrap;
+    }
+
+    function renderHistory(){
+      Array.from(resultsArea.querySelectorAll('.result')).forEach(el=>el.remove());
+      if(state.history.length===0) heroCard.style.display='block';
+      else { heroCard.style.display='none'; state.history.forEach(item=>resultsArea.appendChild(createResultCard(item))); }
+      updateStats();
+    }
+
+    async function callApi(issue, details, variation){
+      const res = await fetch('/api/remedy', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ issue, details, ageGroup: state.ageGroup, lang: state.lang, variation })
+      });
+      if(!res.ok){
+        const data = await res.json().catch(()=>({}));
+        throw new Error(data.error || 'API request failed');
+      }
+      return res.json();
+    }
+
+    async function generate(variation=0){
+      const issue = issueEl.value.trim();
+      const details = detailsEl.value.trim();
+      if(!issue) return;
+      generateBtn.classList.add('loading');
+      generateBtn.disabled = true;
+      try {
+        const remedy = await callApi(issue, details, variation);
+        state.history.unshift({ ...remedy, condition: issue, details, ageGroup: state.ageGroup });
+        renderHistory();
+        state.clearOnNextFocus = true;
+        setTimeout(()=>document.querySelector('.result')?.scrollIntoView({ behavior:'smooth', block:'start' }), 100);
+      } catch(err) {
+        alert(err.message || 'Something went wrong while generating the remedy.');
+      } finally {
+        generateBtn.classList.remove('loading');
+        generateBtn.disabled = false;
+      }
+    }
+
+    function clearFieldOnNextFocus(el){
+      el.addEventListener('focus', ()=>{
+        if(state.clearOnNextFocus){
+          el.value='';
+          if(el === issueEl) detailsEl.value='';
+          state.clearOnNextFocus = false;
+        }
+      });
+    }
+
+    document.getElementById('generateBtn').addEventListener('click', ()=>generate(0));
+    issueEl.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); generate(0); } });
+    detailsEl.addEventListener('keydown', e=>{ if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); generate(0); } });
+    clearFieldOnNextFocus(issueEl);
+    clearFieldOnNextFocus(detailsEl);
+    const adultBtn=document.getElementById('adultBtn');
+    const childBtn=document.getElementById('childBtn');
+    adultBtn.addEventListener('click', ()=>{ state.ageGroup='adult'; adultBtn.classList.add('active'); childBtn.classList.remove('active'); });
+    childBtn.addEventListener('click', ()=>{ state.ageGroup='child'; childBtn.classList.add('active'); adultBtn.classList.remove('active'); });
+    document.getElementById('clearSavedBtn').addEventListener('click', ()=>{ state.saved=[]; saveSaved(); });
+    document.getElementById('exportSavedBtn').addEventListener('click', ()=>{
+      const blob = new Blob([JSON.stringify(state.saved,null,2)], {type:'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a=document.createElement('a'); a.href=url; a.download='nat-saved-remedies.json'; a.click(); URL.revokeObjectURL(url);
+    });
+    document.getElementById('langSwitch').addEventListener('change', (e)=>{ state.lang = e.target.value; applyLanguage(); });
+    renderSaved(); applyLanguage(); renderHistory();
+  </script>
+</body>
+</html>

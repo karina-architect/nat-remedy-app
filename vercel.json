@@ -1,0 +1,7 @@
+{
+  "functions": {
+    "api/remedy.js": {
+      "maxDuration": 30
+    }
+  }
+}
